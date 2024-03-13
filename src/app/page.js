@@ -37,7 +37,7 @@ export default function Home() {
       {ready !== null && (
         <div className="bg-gray-100 p-2 rounded text-black">
           {(!ready || !result) ? (
-            <p>Loading...</p>
+            <p>Loading model... (only run once)</p>
           ) : (
             <div>
               <p className="font-semibold text-center">Sentiment Analysis Result:</p>
