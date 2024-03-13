@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 export default function Home() {
 
@@ -8,19 +8,45 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [ready, setReady] = useState(null);
 
-  const classify = async (text) => {
-    if (!text) return;
-    if (ready === null) setReady(false);
+  // Create a reference to the worker object.
+  const worker = useRef(null);
 
-    // Make a request to the /classify route on the server.
-    const result = await fetch(`/classify?text=${encodeURIComponent(text)}`);
+  // We use the `useEffect` hook to set up the worker as soon as the `App` component is mounted.
+  useEffect(() => {
+    if (!worker.current) {
+      // Create the worker if it does not yet exist.
+      worker.current = new Worker(new URL('./worker.js', import.meta.url), {
+        type: 'module'
+      });
+    }
 
-    // If this is the first time we've made a request, set the ready flag
-    if (!ready) setReady(true);
+    // Create a callback function for messages from the worker thread.
+    const onMessageReceived = (e) => {
+      switch (e.data.status) {
+        case 'initiate':
+          setReady(false);
+          break;
+        case 'ready':
+          setReady(true);
+          break;
+        case 'complete':
+          setResult(e.data.output[0])
+          break;
+      }
+    };
 
-    const json = await result.json();
-    setResult(json);
-  };
+    // Attach the callback function as an event listener.
+    worker.current.addEventListener('message', onMessageReceived);
+
+    // Define a cleanup function for when the component is unmounted.
+    return () => worker.current.removeEventListener('message', onMessageReceived);
+  });
+
+  const classify = useCallback((text) => {
+    if (worker.current) {
+      worker.current.postMessage({ text });
+    }
+  }, []);
 
   const handleSubmit = () => {
     // Trigger classification when the submit button is clicked
@@ -55,18 +81,10 @@ export default function Home() {
           ) : (
             <div>
               <p className="font-semibold text-center">Sentiment Analysis Result:</p>
-              <ul className="list-disc pl-4">
-                {result.map((item, index) => (
-                  <div key={index}>
-                    <div>
-                      <strong>Rating:</strong> <span>{item.label}</span>
-                    </div>
-                    <div>
-                      <strong>Confidence:</strong> <span>{item.score}</span>
-                    </div>
-                  </div>
-                ))}
-              </ul>
+              <div className="border border-gray-300 rounded-md p-4">
+                <p className="text-sm">Rating: {result.label}</p>
+                <p className="text-sm">Confidence: {(result.score * 100).toFixed(2)}%</p>
+              </div>
             </div>
           )}
         </div>
