@@ -13,7 +13,7 @@ export default function Home() {
     if (ready === null) setReady(false);
 
     // Make a request to the /classify route on the server.
-    const result = await fetch(`/classify2?text=${encodeURIComponent(text)}`);
+    const result = await fetch(`/classify?text=${encodeURIComponent(text)}`);
 
     // If this is the first time we've made a request, set the ready flag
     if (!ready) setReady(true);
