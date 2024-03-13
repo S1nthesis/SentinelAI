@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Link from 'next/link';
 
 export default function Home() {
 
@@ -61,40 +62,49 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-12">
-      <h1 className="text-5xl font-bold mb-2 text-center animated-gradient">SentinelAI</h1>
-      <h2 className="text-2xl mb-4 text-center">Enter text below to analyze sentiment</h2>
-      <div className="flex mb-4">
-        <input
-          id="textInput"
-          type="text"
-          className="w-full max-w-xs p-2 border border-gray-300 rounded mr-2 text-black"
-          placeholder="Enter text here"
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Submit
-        </button>
-      </div>
-
-      {ready !== null && (
-        <div className="bg-gray-100 p-2 rounded text-black" style={{ maxWidth: '500px', width: '80vw' }}>
-          {(!ready || !result) ? (
-            <p>Loading model... (only run once)</p>
-          ) : (
-            <div>
-              <p className="font-semibold text-center">Sentiment Analysis Result:</p>
-              <div className="border border-gray-300 rounded-md p-4">
-                <p className="text-sm">Rating: {result.label}</p>
-                <p className="text-sm">Confidence: {(result.score * 100).toFixed(2)}%</p>
-              </div>
-            </div>
-          )}
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-grow flex flex-col items-center justify-center p-12">
+        <h1 className="text-5xl font-bold mb-2 text-center animated-gradient">SentinelAI</h1>
+        <h2 className="text-2xl mb-4 text-center">Enter text below to analyze sentiment</h2>
+        <div className="flex mb-4">
+          <input
+            id="textInput"
+            type="text"
+            className="w-full max-w-xs p-2 border border-gray-300 rounded mr-2 text-black"
+            placeholder="Enter text here"
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Submit
+          </button>
         </div>
-      )}
-    </main>
+
+        {ready !== null && (
+          <div className="bg-gray-100 p-2 rounded text-black" style={{ maxWidth: '500px', width: '80vw' }}>
+            {(!ready || !result) ? (
+              <p>Loading model... (only run once)</p>
+            ) : (
+              <div>
+                <p className="font-semibold text-center">Sentiment Analysis Result:</p>
+                <div className="border border-gray-300 rounded-md p-4">
+                  <p className="text-sm">Rating: {result.label}</p>
+                  <p className="text-sm">Confidence: {(result.score * 100).toFixed(2)}%</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      <footer className="mt-auto text-gray-600 text-center text-sm">
+        © 2024 Christopher Vu. All rights reserved. | {' '}
+        <Link className="text-blue-500 hover:underline" href="https://chris-vu.vercel.app/">
+          Visit my portfolio
+        </Link>
+      </footer>
+    </div>
   )
 }
